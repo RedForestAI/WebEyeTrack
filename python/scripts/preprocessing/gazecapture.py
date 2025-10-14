@@ -296,6 +296,9 @@ class GazeCaptureDataset():
                 # Load the image
                 image_np = cv2.imread(str(frame_fp))
 
+                # Convert BGR->RGB
+                image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
+
                 if self.face_landmarker is None:
                     self.load_model()
 

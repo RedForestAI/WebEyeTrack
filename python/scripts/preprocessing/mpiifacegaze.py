@@ -195,6 +195,9 @@ class MPIIFaceGazeDataset():
                     # cv2.waitKey(0)
                     # cv2.destroyAllWindows()
 
+                    # Convert BGR->RGB
+                    image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
+
                     # If the face landmark already exists, load it instead of computing it
                     face_landmarks_dir = participant_dir / 'face_landmarks'
                     os.makedirs(face_landmarks_dir, exist_ok=True)
