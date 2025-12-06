@@ -133,8 +133,9 @@ export default function CalibrationOverlay({
               />
             </div>
 
-            {/* Calibration dot */}
+            {/* Calibration dot - key forces React to recreate component for each point */}
             <CalibrationDot
+              key={state.currentPointIndex}
               position={currentPosition}
               onAnimationComplete={handleAnimationComplete}
             />

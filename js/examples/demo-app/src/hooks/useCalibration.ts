@@ -171,6 +171,9 @@ export function useCalibration({
   /**
    * Finish collecting samples for current point
    * Apply filtering and move to next point or complete calibration
+   *
+   * NOTE: Uses functional setState to avoid stale closure issues.
+   * Dependencies are minimized to prevent callback churn.
    */
   const finishCurrentPoint = useCallback(async () => {
     if (collectionTimerRef.current) {
@@ -179,48 +182,62 @@ export function useCalibration({
     }
 
     const currentSamples = [...samplesRef.current];
-    const currentPoint = DEFAULT_CALIBRATION_POSITIONS[state.currentPointIndex];
 
-    console.log(`Finishing point ${state.currentPointIndex + 1}, collected ${currentSamples.length} samples`);
+    // Use setState callback form to get current state values
+    // This avoids stale closure issues with state.currentPointIndex
+    setState(prev => {
+      const currentPoint = DEFAULT_CALIBRATION_POSITIONS[prev.currentPointIndex];
 
-    // Apply statistical filtering (matching Python main.py:217-238)
-    const filteredSample = filterSamples(currentSamples);
+      console.log(`Finishing point ${prev.currentPointIndex + 1}, collected ${currentSamples.length} samples`);
 
-    if (!filteredSample) {
-      const error = `Failed to collect samples for point ${state.currentPointIndex + 1}`;
-      console.error(error);
-      setState(prev => ({ ...prev, status: 'error', error }));
-      if (onError) onError(error);
-      return;
-    }
+      // Apply statistical filtering (matching Python main.py:217-238)
+      const filteredSample = filterSamples(currentSamples);
 
-    // Store point data
-    const pointData: CalibrationPointData = {
-      position: currentPoint,
-      samples: currentSamples,
-      filteredSample
-    };
+      if (!filteredSample) {
+        const error = `Failed to collect samples for point ${prev.currentPointIndex + 1}`;
+        console.error(error);
+        if (onError) onError(error);
+        return { ...prev, status: 'error' as const, error };
+      }
 
-    const newPointsData = [...state.pointsData, pointData];
+      // Store point data
+      const pointData: CalibrationPointData = {
+        position: currentPoint,
+        samples: currentSamples,
+        filteredSample
+      };
 
-    // Check if this was the last point
-    if (state.currentPointIndex + 1 >= config.numPoints) {
-      // All points collected, perform adaptation
-      await performAdaptation(newPointsData);
-    } else {
-      // Move to next point
-      setState(prev => ({
-        ...prev,
-        currentPointIndex: prev.currentPointIndex + 1,
-        pointsData: newPointsData,
-        status: 'collecting'
-      }));
-    }
-  }, [state, config.numPoints, onError, performAdaptation]);
+      const newPointsData = [...prev.pointsData, pointData];
+
+      // Check if this was the last point
+      if (prev.currentPointIndex + 1 >= config.numPoints) {
+        // All points collected, perform adaptation (async, outside setState)
+        // Schedule adaptation after state update
+        setTimeout(() => performAdaptation(newPointsData), 0);
+        return { ...prev, status: 'processing' as const, pointsData: newPointsData };
+      } else {
+        // Move to next point
+        return {
+          ...prev,
+          currentPointIndex: prev.currentPointIndex + 1,
+          pointsData: newPointsData,
+          status: 'collecting' as const
+        };
+      }
+    });
+  }, [config.numPoints, onError, performAdaptation]);
+
+  // Use ref for finishCurrentPoint to prevent handleAnimationComplete from changing
+  const finishCurrentPointRef = useRef(finishCurrentPoint);
+  React.useEffect(() => {
+    finishCurrentPointRef.current = finishCurrentPoint;
+  }, [finishCurrentPoint]);
 
   /**
    * Handle animation completion (dot turned white)
    * Start collecting samples
+   *
+   * NOTE: Uses refs to avoid callback churn that was causing infinite timer resets
    */
   const handleAnimationComplete = useCallback(() => {
     if (state.status !== 'collecting') return;
@@ -231,10 +248,11 @@ export function useCalibration({
     samplesRef.current = [];
 
     // Stop collection after specified duration
+    // Use ref to always call the latest finishCurrentPoint without dependency churn
     collectionTimerRef.current = setTimeout(() => {
-      finishCurrentPoint();
+      finishCurrentPointRef.current();
     }, config.collectionDuration);
-  }, [state.status, state.currentPointIndex, config.collectionDuration, finishCurrentPoint]);
+  }, [state.status, state.currentPointIndex, config.collectionDuration]);
 
   /**
    * Start calibration workflow

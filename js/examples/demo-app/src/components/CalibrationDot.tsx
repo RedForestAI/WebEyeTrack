@@ -1,16 +1,19 @@
 /**
  * CalibrationDot Component
  *
- * Displays an animated calibration dot with crosshair overlay
+ * Research-grade concentric rings calibration target (Tobii/SMI style)
  * Reference: Python implementation at python/demo/calibration_widget.py
  *
  * Features:
- * - Circular dot with perpendicular crosshair lines
+ * - Concentric rings design: outer ring (60px) + inner ring (40px) + core (16px)
  * - Color animation: red → white (2000ms) to guide user attention
+ * - Outer ring pulsing animation for visual feedback
+ * - Crosshair overlay for precise fixation
+ * - Glow effect on completion
  * - Positioned using normalized coordinates [-0.5, 0.5]
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { CalibrationPoint } from '../types/calibration';
 import { normalizedToPixels } from '../utils/calibrationHelpers';
 
@@ -23,18 +26,33 @@ interface CalibrationDotProps {
 
   /** Callback when animation completes (dot turns white) */
   onAnimationComplete?: () => void;
-
-  /** Size of the dot in pixels (default: 40) */
-  size?: number;
 }
+
+// Design constants for concentric rings
+const OUTER_RING_SIZE = 60;
+const INNER_RING_SIZE = 40;
+const CORE_SIZE = 16;
+const CROSSHAIR_LENGTH = 50;
+const CROSSHAIR_THICKNESS = 2;
 
 export default function CalibrationDot({
   position,
   animationDuration = 2000,
   onAnimationComplete,
-  size = 40
 }: CalibrationDotProps) {
   const [isWhite, setIsWhite] = useState(false);
+
+  // Check for reduced motion preference
+  const prefersReducedMotion = useRef(
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  // Use ref for callback to prevent effect re-running when callback reference changes
+  const onAnimationCompleteRef = useRef(onAnimationComplete);
+  useEffect(() => {
+    onAnimationCompleteRef.current = onAnimationComplete;
+  }, [onAnimationComplete]);
 
   // Convert normalized position to pixel coordinates
   const pixelPosition = normalizedToPixels(
@@ -43,7 +61,7 @@ export default function CalibrationDot({
     window.innerHeight
   );
 
-  // Trigger animation on mount or position change
+  // Trigger animation on mount or position change only
   useEffect(() => {
     setIsWhite(false);
 
@@ -54,8 +72,8 @@ export default function CalibrationDot({
 
     // Trigger completion callback when animation finishes
     const completeTimer = setTimeout(() => {
-      if (onAnimationComplete) {
-        onAnimationComplete();
+      if (onAnimationCompleteRef.current) {
+        onAnimationCompleteRef.current();
       }
     }, animationDuration + 50);
 
@@ -63,10 +81,10 @@ export default function CalibrationDot({
       clearTimeout(startTimer);
       clearTimeout(completeTimer);
     };
-  }, [position, animationDuration, onAnimationComplete]);
+  }, [position, animationDuration]);
 
-  const crosshairLength = size * 1.5;
-  const crosshairThickness = 2;
+  // Colors
+  const activeColor = isWhite ? '#ffffff' : '#ef4444'; // Tailwind red-500 → white
 
   return (
     <div
@@ -74,45 +92,79 @@ export default function CalibrationDot({
       style={{
         left: pixelPosition.x,
         top: pixelPosition.y,
-        transform: 'translate(-50%, -50%)', // Center the dot on the position
       }}
     >
-      {/* Main circular dot */}
+      {/* Outer ring - white with pulsing animation */}
       <div
-        className="rounded-full transition-colors"
+        className={prefersReducedMotion.current ? '' : 'animate-pulse-ring'}
         style={{
-          width: size,
-          height: size,
-          backgroundColor: isWhite ? '#ffffff' : '#ff0000',
-          transitionDuration: `${animationDuration}ms`,
-          transitionTimingFunction: 'linear',
-          boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', // Add subtle shadow for visibility
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          width: OUTER_RING_SIZE,
+          height: OUTER_RING_SIZE,
+          borderRadius: '50%',
+          border: '2px solid rgba(255, 255, 255, 0.4)',
+          transform: 'translate(-50%, -50%)',
         }}
       />
 
-      {/* Crosshair overlay - Horizontal line */}
+      {/* Inner ring - transitions red → white */}
       <div
-        className="absolute bg-white"
         style={{
+          position: 'absolute',
           left: '50%',
           top: '50%',
-          width: crosshairLength,
-          height: crosshairThickness,
+          width: INNER_RING_SIZE,
+          height: INNER_RING_SIZE,
+          borderRadius: '50%',
+          border: `3px solid ${activeColor}`,
           transform: 'translate(-50%, -50%)',
-          opacity: 0.8,
+          transition: `border-color ${animationDuration}ms linear`,
         }}
       />
 
-      {/* Crosshair overlay - Vertical line */}
+      {/* Core dot - solid fill transitions red → white */}
       <div
-        className="absolute bg-white"
         style={{
+          position: 'absolute',
           left: '50%',
           top: '50%',
-          width: crosshairThickness,
-          height: crosshairLength,
+          width: CORE_SIZE,
+          height: CORE_SIZE,
+          borderRadius: '50%',
+          backgroundColor: activeColor,
           transform: 'translate(-50%, -50%)',
-          opacity: 0.8,
+          transition: `background-color ${animationDuration}ms linear`,
+          boxShadow: isWhite
+            ? '0 0 20px rgba(255, 255, 255, 0.5)'
+            : '0 0 10px rgba(239, 68, 68, 0.3)',
+        }}
+      />
+
+      {/* Crosshair - Horizontal line */}
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          width: CROSSHAIR_LENGTH,
+          height: CROSSHAIR_THICKNESS,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          transform: 'translate(-50%, -50%)',
+        }}
+      />
+
+      {/* Crosshair - Vertical line */}
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          width: CROSSHAIR_THICKNESS,
+          height: CROSSHAIR_LENGTH,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          transform: 'translate(-50%, -50%)',
         }}
       />
     </div>
