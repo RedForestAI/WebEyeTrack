@@ -1,6 +1,6 @@
 {
   "name": "@koyukan/webeyetrack",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Enhanced WebEyeTrack with professional-grade features, performance optimizations, and improved developer experience",
   "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",
@@ -77,8 +77,6 @@
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.18",
     "@tensorflow/tfjs": "^4.22.0",
-    "mathjs": "^14.5.2",
-    "ml-matrix": "^6.12.1",
-    "npm-run-all": "^4.1.5"
+    "ml-matrix": "^6.12.1"
   }
 }

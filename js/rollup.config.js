@@ -7,7 +7,6 @@ import dts from 'rollup-plugin-dts';
 const external = [
   '@mediapipe/tasks-vision',
   '@tensorflow/tfjs',
-  'mathjs',
   'ml-matrix'
 ];
 
