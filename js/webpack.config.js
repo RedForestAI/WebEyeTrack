@@ -1,6 +1,6 @@
 const path = require('path');
 
-const manager = {
+const umdBrowserConfig = {
     mode: 'production',
     entry: './src/index.ts',
     resolve: {
@@ -11,18 +11,26 @@ const manager = {
     },
     module: {
         rules: [
-            { test: /\.ts$/, loader: 'ts-loader' },
+            {
+                test: /\.ts$/,
+                loader: 'ts-loader',
+                options: {
+                    configFile: 'tsconfig.json'
+                }
+            },
         ],
     },
     output: {
-        filename: 'index.js',
+        filename: 'index.umd.js',
         path: path.resolve(__dirname, 'dist'),
-        libraryTarget: 'umd',
+        library: {
+            name: 'WebEyeTrack',
+            type: 'umd'
+        },
         globalObject: 'typeof self !== \'undefined\' ? self : this'
     },
+    devtool: 'source-map'
 };
 
-module.exports = [
-    manager
-];
+module.exports = [umdBrowserConfig];
 

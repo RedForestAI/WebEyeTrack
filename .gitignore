@@ -7,6 +7,14 @@
 # NodeJS
 node_modules/
 
+# JavaScript/TypeScript build artifacts
+*.tsbuildinfo
+.rollup.cache/
+
+# Compiled JavaScript in examples
+js/examples/*/public/webeyetrack.worker.js
+js/examples/*/public/webeyetrack.worker.js.map
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

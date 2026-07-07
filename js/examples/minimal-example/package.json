@@ -1,7 +1,7 @@
 {
   "name": "minimal-example",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,10 +12,11 @@
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "webeyetrack": "^0.0.2"
+    "webeyetrack": "file:../../"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@rollup/plugin-commonjs": "^28.0.8",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.2",

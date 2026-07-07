@@ -1,46 +1,82 @@
 {
-  "name": "webeyetrack",
-  "version": "0.0.2",
-  "description": "A library for real-time eye tracking in the browser",
-  "main": "dist/index.js",
+  "name": "@koyukan/webeyetrack",
+  "version": "1.0.4",
+  "description": "Enhanced WebEyeTrack with professional-grade features, performance optimizations, and improved developer experience",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.esm.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
+  "sideEffects": false,
   "scripts": {
     "clean": "rm -rf dist",
-    "webpack": "npx webpack --config webpack.config.js",
-    "build": "npm-run-all clean webpack",
-    "test": "jest"
+    "build:webpack": "webpack --config webpack.config.js",
+    "build:worker": "webpack --config webpack.worker.config.js",
+    "build:rollup": "rollup -c rollup.config.js",
+    "build:types": "tsc --project tsconfig.types.json",
+    "build": "npm run clean && npm run build:types && npm run build:rollup && npm run build:webpack && npm run build:worker",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/RedForestAI/WebEyeTrack.git"
+    "url": "https://github.com/koyukan/WebEyeTrack.git"
   },
-  "homepage": "https://redforestai.github.io/WebEyeTrack/",
+  "homepage": "https://github.com/koyukan/WebEyeTrack",
   "keywords": [
     "eye-tracking",
     "real-time",
-    "browser"
+    "browser",
+    "webeyetrack",
+    "fork",
+    "enhanced",
+    "typescript",
+    "memory-management",
+    "performance"
   ],
-  "author": "Eduardo Davalos",
+  "author": "Huseyin Koyukan",
+  "contributors": [
+    "Eduardo Davalos (original WebEyeTrack author)",
+    "Yike Zhang",
+    "Amanda Goodwin",
+    "Gautam Biswas"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@babel/preset-env": "^7.27.2",
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^12.1.0",
     "@types/jest": "^29.5.12",
     "canvas": "^3.1.0",
     "jest": "^29.7.0",
+    "rollup": "^4.28.0",
+    "rollup-plugin-dts": "^6.1.1",
+    "rollup-plugin-web-worker-loader": "^1.6.1",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.2",
+    "tslib": "^2.8.1",
     "typescript": "^5.8.3",
     "webpack": "^5.99.9",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^6.0.1",
+    "worker-loader": "^3.0.8"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.18",
     "@tensorflow/tfjs": "^4.22.0",
-    "mathjs": "^14.5.2",
-    "ml-matrix": "^6.12.1",
-    "npm-run-all": "^4.1.5",
-    "worker-loader": "^3.0.8"
+    "ml-matrix": "^6.12.1"
   }
 }

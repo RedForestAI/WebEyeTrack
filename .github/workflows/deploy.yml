@@ -1,9 +1,9 @@
-name: Deploy React to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main # name of the branch you are pushing to
+      - main
 
 jobs:
   build:
@@ -11,18 +11,37 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install Dependencies
-        run: cd docs/ && npm ci
-      - name: Build
-        run: cd docs/ && npm run build
+
+      # Build docs site
+      - name: Install docs dependencies
+        run: cd docs && npm ci
+
+      - name: Build docs
+        run: cd docs && npm run build
+
+      # Build demo app (uses npm package via alias)
+      - name: Install demo-app dependencies
+        run: cd js/examples/demo-app && npm ci
+
+      - name: Build demo-app
+        run: cd js/examples/demo-app && npm run build
+        env:
+          PUBLIC_URL: /WebEyeTrack/demo
+
+      # Combine outputs
+      - name: Copy demo to docs dist
+        run: cp -r js/examples/demo-app/build docs/dist/demo
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs/dist'
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -31,9 +50,10 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: 'https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/'
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Deploy
+        id: deployment
         uses: actions/deploy-pages@v4

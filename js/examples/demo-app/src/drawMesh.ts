@@ -1,5 +1,5 @@
 import { GazeResult } from 'webeyetrack';
-import { FaceLandmarker, FilesetResolver, DrawingUtils, FaceLandmarkerResult } from "@mediapipe/tasks-vision";
+import { FaceLandmarker, DrawingUtils } from "@mediapipe/tasks-vision";
 
 export function drawMesh(gaze_result: GazeResult, canvas: HTMLCanvasElement) {
 

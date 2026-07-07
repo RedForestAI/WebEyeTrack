@@ -12,7 +12,7 @@ self.onmessage = async (e) => {
   switch (type) {
     case 'init':
       tracker = new WebEyeTrack();
-      await tracker.initialize();
+      await tracker.initialize(payload?.modelPath);
       self.postMessage({ type: 'ready' });
       status = 'idle';
       break;
@@ -31,16 +31,69 @@ self.onmessage = async (e) => {
         self.postMessage({ type: 'statusUpdate', status: status});
       }
       break;
-    
+
     case 'click':
       // Handle click event for re-calibration
       status = 'calib';
       self.postMessage({ type: 'statusUpdate', status: status});
 
       tracker.handleClick(payload.x, payload.y);
-      
+
       status = 'idle';
       self.postMessage({ type: 'statusUpdate', status: status});
+      break;
+
+    case 'adapt':
+      // Handle manual calibration adaptation
+      status = 'calib';
+      self.postMessage({ type: 'statusUpdate', status: status});
+
+      try {
+        tracker.adapt(
+          payload.eyePatches,
+          payload.headVectors,
+          payload.faceOrigins3D,
+          payload.normPogs,
+          payload.stepsInner,
+          payload.innerLR,
+          payload.ptType
+        );
+        self.postMessage({ type: 'adaptComplete', success: true });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Adaptation failed';
+        self.postMessage({ type: 'adaptComplete', success: false, error: errorMessage });
+      }
+
+      status = 'idle';
+      self.postMessage({ type: 'statusUpdate', status: status});
+      break;
+
+    case 'clearCalibration':
+      // Clear calibration buffer for re-calibration
+      if (tracker) {
+        tracker.clearCalibrationBuffer();
+      }
+      break;
+
+    case 'clearClickstream':
+      // Clear clickstream buffer while preserving calibration
+      if (tracker) {
+        tracker.clearClickstreamPoints();
+      }
+      break;
+
+    case 'resetAllBuffers':
+      // Reset both calibration and clickstream buffers
+      if (tracker) {
+        tracker.resetAllBuffers();
+      }
+      break;
+
+    case 'dispose':
+      // Clean up tracker resources before worker termination
+      if (tracker) {
+        tracker.dispose();
+      }
       break;
 
     default:

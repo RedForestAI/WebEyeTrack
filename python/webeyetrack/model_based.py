@@ -255,9 +255,14 @@ def estimate_2d_3d_eye_face_origins(perspective_matrix, facial_landmarks, face_r
     }
 
 def face_reconstruction(perspective_matrix, face_landmarks, face_width_cm, face_rt, K, frame_width, frame_height, initial_z_guess=60, frame=None):
-    
-    # 1) Convert uvz to xyz
-    relative_face_mesh = np.array([convert_uv_to_xyz(perspective_matrix, x[0], x[1], x[2]) for x in face_landmarks[:, :3]])
+
+    # PERFORMANCE OPTIMIZATION: Perspective matrix is constant across all 478 landmarks.
+    # Computing inverse once instead of 478 times provides ~10-50x speedup for this
+    # operation with zero impact on accuracy. See MATRIX_INVERSION_ANALYSIS.md for details.
+    inv_perspective_matrix = np.linalg.inv(perspective_matrix)
+
+    # 1) Convert uvz to xyz using pre-inverted matrix (OPTIMIZED)
+    relative_face_mesh = np.array([convert_uv_to_xyz_with_inverse(inv_perspective_matrix, x[0], x[1], x[2]) for x in face_landmarks[:, :3]])
     
     # 2) Center to the nose 
     nose = relative_face_mesh[4]

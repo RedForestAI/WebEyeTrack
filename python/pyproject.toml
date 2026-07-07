@@ -1,6 +1,6 @@
 [project]
 name = "webeyetrack"
-version = "0.0.1"
+version = "1.0.0"
 description = "WebEyeTrack: Robust & Scalable Gaze Tracking for Web Applications"
 authors = [
     {name = "Eduardo Davalos", email="eduardo.davalos.anaya@vanderbilt.edu"}
@@ -29,8 +29,9 @@ threed = [
 ]
 
 [project.urls]
-homepath = "https://redforestai.github.io/WebEyeTrack/"
-repository = "https://github.com/RedForestAI/WebEyeTrack"
+homepath = "https://github.com/koyukan/WebEyeTrack"
+repository = "https://github.com/koyukan/WebEyeTrack"
+upstream = "https://github.com/RedForestAI/WebEyeTrack"
 
 [build-system]
 requires = ["setuptools", "wheel"]

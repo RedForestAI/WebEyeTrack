@@ -190,7 +190,7 @@ export default function App() {
               {/* https://youtu.be/EhFJplhuQGY */}
               {/* <img src={`${import.meta.env.BASE_URL}/demo.gif`} alt="WebEyeTrack demo screenshot" className="rounded-lg border w-full" /> */}
               <Button className="w-full mt-4" variant="outline" size="lg">
-                <a href="https://azure-olympie-5.tiiny.site" target="_blank" rel="noreferrer noopener" className="w-full">
+                <a href="https://koyukan.github.io/WebEyeTrack/demo/" target="_blank" rel="noreferrer noopener" className="w-full">
                 Click to use live demo
                 </a>
               </Button>

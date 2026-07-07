@@ -1,9 +1,11 @@
 import { FaceLandmarker, FilesetResolver, DrawingUtils, FaceLandmarkerResult } from "@mediapipe/tasks-vision";
+import { IDisposable } from './IDisposable';
 
 // References
 // https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker/web_js#video
-export default class FaceLandmarkerClient {
-  private faceLandmarker: any;
+export default class FaceLandmarkerClient implements IDisposable {
+  private faceLandmarker: FaceLandmarker | null = null;
+  private _disposed: boolean = false;
 
   constructor() {
   }
@@ -33,5 +35,31 @@ export default class FaceLandmarkerClient {
     let result: FaceLandmarkerResult;
     result = await this.faceLandmarker.detect(frame);
     return result;
+  }
+
+  /**
+   * Disposes the MediaPipe FaceLandmarker and releases resources.
+   */
+  dispose(): void {
+    if (this._disposed) {
+      return;
+    }
+
+    if (this.faceLandmarker) {
+      // MediaPipe tasks have a close() method to release resources
+      if ('close' in this.faceLandmarker && typeof this.faceLandmarker.close === 'function') {
+        this.faceLandmarker.close();
+      }
+      this.faceLandmarker = null;
+    }
+
+    this._disposed = true;
+  }
+
+  /**
+   * Returns true if dispose() has been called.
+   */
+  get isDisposed(): boolean {
+    return this._disposed;
   }
 }

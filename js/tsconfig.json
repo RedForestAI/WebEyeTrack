@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": [
-      "es2015",
-      "dom"
-    ],
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "inlineSources": true,
+    "outDir": "./dist/types",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": false,
-    "skipLibCheck": true
+    "strict": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
   },
-  "exclude": [
-    "example-app",
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "examples"]
 }

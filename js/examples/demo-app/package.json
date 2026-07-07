@@ -1,6 +1,6 @@
 {
   "name": "webeyetrack-demo",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "homepage": "./",
   "dependencies": {
@@ -9,21 +9,38 @@
     "@testing-library/user-event": "^14.2.0",
     "@types/jest": "^27.5.1",
     "@types/node": "^17.0.34",
-    "@types/react": "^18.0.9",
-    "@types/react-dom": "^18.0.4",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@types/video.js": "^7.3.58",
     "autoprefixer": "^10.4.21",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
+    "kollar-ts": "^0.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^4.6.4",
+    "video.js": "^8.23.4",
     "web-vitals": "^2.1.4",
-    "webeyetrack": "^0.0.2"
+    "webeyetrack": "npm:@koyukan/webeyetrack@^1.0.2",
+    "zustand": "^5.0.8"
+  },
+  "overrides": {
+    "postcss": "^8.5.10",
+    "serialize-javascript": "^7.0.5",
+    "underscore": "^1.13.8"
   },
   "devDependencies": {
+    "esbuild": "^0.27.0",
     "react-scripts": "5.0.1"
   },
   "scripts": {
+    "copy-worker": "node scripts/copy-worker.js",
+    "build-fixation-worker": "node scripts/build-fixation-worker.js",
+    "prepare-workers": "npm run copy-worker && npm run build-fixation-worker",
+    "postinstall": "npm run prepare-workers",
+    "prestart": "npm run prepare-workers",
+    "prebuild": "npm run prepare-workers",
     "start": "react-scripts start",
+    "dev:local": "rm -rf node_modules/webeyetrack && npm link ../../ && npm run prepare-workers && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
