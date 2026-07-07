@@ -5,6 +5,7 @@
     "lib": ["es2020", "dom"],
     "declaration": false,
     "sourceMap": true,
+    "inlineSources": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

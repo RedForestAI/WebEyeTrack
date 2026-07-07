@@ -4,6 +4,40 @@ All notable changes to this enhanced fork of WebEyeTrack are documented in this 
 
 This fork is maintained by Huseyin Koyukan and is based on the original [WebEyeTrack](https://github.com/RedForestAI/WebEyeTrack) by Eduardo Davalos et al.
 
+## [1.0.4] - 2026-07-07
+
+### Fixed
+
+- Published sourcemaps for the ESM and CJS bundles now embed the original TypeScript sources (`inlineSources` in the Rollup/CJS TypeScript configs). Previously `index.cjs.map`, `index.esm.js.map`, and `index.esm.min.js.map` referenced `src/*.ts` files that are not shipped in the package, causing harmless but noisy "Failed to parse source map" warnings in consumer builds (e.g. CRA/webpack via source-map-loader). The UMD and worker maps were already self-contained.
+- No runtime changes: all five distributed bundles are byte-identical to 1.0.3.
+
+### Security
+
+- Dev/build dependency updates from the repo-wide npm audit remediation: `@rollup/plugin-terser` 0.4.4 → 1.0.0 (pulls `serialize-javascript` ≥7.0.5), plus lockfile-level fixes for `form-data`, `js-yaml`, and `@babel/core`. None of these affect the published artifact or its runtime dependency ranges.
+
+## [1.0.3] - 2026-05-12
+
+### Changed
+
+- Calibration animation redesigned with concentric rings.
+- Dropped unused `mathjs` and `npm-run-all` dependencies from the published package.
+
+## [1.0.2] - 2025-12-06
+
+### Added
+
+- Configurable `modelPath` to support hosting under a subdirectory (e.g. GitHub Pages).
+
+### Fixed
+
+- Resolved all ESLint warnings for CI builds; regenerated lockfile against the npm registry.
+
+## [1.0.1] - 2025-11-14
+
+### Fixed
+
+- Removed webpack-specific `worker-loader` syntax from the ESM build so non-webpack bundlers can consume it.
+
 ## [1.0.0] - 2025-11-13
 
 ### Fork Created

@@ -1,6 +1,6 @@
 {
   "name": "@koyukan/webeyetrack",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Enhanced WebEyeTrack with professional-grade features, performance optimizations, and improved developer experience",
   "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",
