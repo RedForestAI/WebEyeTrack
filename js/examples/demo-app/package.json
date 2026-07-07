@@ -23,6 +23,11 @@
     "webeyetrack": "npm:@koyukan/webeyetrack@^1.0.2",
     "zustand": "^5.0.8"
   },
+  "overrides": {
+    "postcss": "^8.5.10",
+    "serialize-javascript": "^7.0.5",
+    "underscore": "^1.13.8"
+  },
   "devDependencies": {
     "esbuild": "^0.27.0",
     "react-scripts": "5.0.1"
