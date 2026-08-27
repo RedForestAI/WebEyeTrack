@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Menu, Github } from "lucide-react";
+import DemoApp from "./demo/DemoApp";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -44,7 +45,7 @@ function scrollToId(id: string) {
   el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function DesktopNav() {
+function DesktopNav({ onOpenDemo }: { onOpenDemo: () => void }) {
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
@@ -62,12 +63,24 @@ function DesktopNav() {
             </NavigationMenuLink>
           </NavigationMenuItem>
         ))}
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild>
+            <Button
+              variant="default"
+              size="sm"
+              className="font-medium"
+              onClick={onOpenDemo}
+            >
+              Demo
+            </Button>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
 }
 
-function MobileNav() {
+function MobileNav({ onOpenDemo }: { onOpenDemo: () => void }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -95,6 +108,13 @@ function MobileNav() {
               {s.label}
             </Button>
           ))}
+          <Button
+            variant="default"
+            className="w-full justify-start text-base"
+            onClick={onOpenDemo}
+          >
+            Demo
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
@@ -120,6 +140,13 @@ function Section({ id, title, children }: React.PropsWithChildren<{ id: string; 
 }
 
 export default function App() {
+  const [view, setView] = useState<"home" | "demo">("home");
+  const openDemo = () => setView("demo");
+
+  if (view === "demo") {
+    return <DemoApp onBack={() => setView("home")} />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground w-full">
       {/* Fixed top bar */}
@@ -142,7 +169,7 @@ export default function App() {
               </a>
             </div>
 
-            <DesktopNav />
+            <DesktopNav onOpenDemo={openDemo} />
             <div className="flex items-center gap-2">
               <a
                 href="https://github.com/RedForestAI/WebEyeTrack"
@@ -155,7 +182,7 @@ export default function App() {
                   GitHub
                 </Button>
               </a>
-              <MobileNav />
+              <MobileNav onOpenDemo={openDemo} />
             </div>
           </div>
         </div>
@@ -189,10 +216,8 @@ export default function App() {
 
               {/* https://youtu.be/EhFJplhuQGY */}
               {/* <img src={`${import.meta.env.BASE_URL}/demo.gif`} alt="WebEyeTrack demo screenshot" className="rounded-lg border w-full" /> */}
-              <Button className="w-full mt-4" variant="outline" size="lg">
-                <a href="https://azure-olympie-5.tiiny.site" target="_blank" rel="noreferrer noopener" className="w-full">
+              <Button className="w-full mt-4" variant="outline" size="lg" onClick={openDemo}>
                 Click to use live demo
-                </a>
               </Button>
             </div>
 

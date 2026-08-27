@@ -11,8 +11,8 @@ export default class BlazeGaze {
         // Optionally trigger model load in constructor
     }
 
-    async loadModel(): Promise<void> {
-        const path = `${self.location.origin}/web/model.json`;
+    async loadModel(baseUrl: string = self.location.origin): Promise<void> {
+        const path = `${baseUrl.replace(/\/$/, '')}/web/model.json`;
         try {
             // Load model from local directory (adjust path if needed)
             this.model = await tf.loadLayersModel(path);

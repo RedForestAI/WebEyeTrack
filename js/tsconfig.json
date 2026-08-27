@@ -15,6 +15,6 @@
     "skipLibCheck": true
   },
   "exclude": [
-    "example-app",
+    "examples",
   ]
 }

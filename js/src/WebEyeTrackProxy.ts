@@ -51,8 +51,12 @@ export default class WebEyeTrackProxy {
       }
     }
 
-    // Initialize the worker
-    this.worker.postMessage({ type: 'init' });
+    // Initialize the worker, passing along the page's base URL so the
+    // BlazeGaze model is fetched relative to the app's deployment path
+    // (e.g. GitHub Pages project sites served from a subpath) rather than
+    // always assuming the domain root.
+    const baseUrl = new URL('.', document.baseURI).toString();
+    this.worker.postMessage({ type: 'init', payload: { baseUrl } });
 
     // Add mouse handler for re-calibration
     window.addEventListener('click', (e: MouseEvent) => {
