@@ -25,12 +25,17 @@ export default class WebEyeTrackProxy {
 
           // Start the webcam client and set up the frame callback
           webcamClient.startWebcam(async (frame: ImageData, timestamp: number) => {
-            // Send the frame to the worker for processing
+            // Send the frame to the worker for processing. The pixel buffer
+            // is transferred (not structurally cloned) so posting a frame
+            // doesn't block the main thread copying ~1MB per frame.
             if (this.status === 'idle') {
-              this.worker.postMessage({
-                type: 'step',
-                payload: { frame, timestamp }
-              })
+              this.worker.postMessage(
+                {
+                  type: 'step',
+                  payload: { frame, timestamp }
+                },
+                [frame.data.buffer]
+              )
             }
           });
           break;

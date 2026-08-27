@@ -34,10 +34,12 @@ export default class WebcamClient {
                 this.frameCallback = frameCallback;
             }
 
-            // Start video playback
-            this.videoElement.onloadedmetadata = () => {
+            // Start video playback. Uses addEventListener (not
+            // onloadedmetadata) so we don't clobber a handler a consumer may
+            // have already assigned to the same video element.
+            this.videoElement.addEventListener('loadedmetadata', () => {
                 this.videoElement.play();
-            };
+            });
 
             this.videoElement.addEventListener('loadeddata', () => {
                 this._processFrames();

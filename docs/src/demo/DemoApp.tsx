@@ -10,6 +10,7 @@ interface DemoAppProps {
 }
 
 export default function DemoApp({ onBack }: DemoAppProps) {
+  const [loading, setLoading] = useState(true);
   const [gaze, setGaze] = useState({ x: 0, y: 0, gazeState: "closed" });
   const [debugData, setDebugData] = useState({});
   const [perfData, setPerfData] = useState({});
@@ -47,6 +48,12 @@ export default function DemoApp({ onBack }: DemoAppProps) {
             console.log(`Canvas size set to: ${width}x${height}`);
           }
         };
+
+        // The camera stream only starts once the face-landmark and gaze
+        // models finish downloading/initializing (first visit downloads a
+        // few MB from CDN + local weights, which can take several seconds).
+        // Surface that as a loading state instead of a blank/frozen screen.
+        videoRef.current.addEventListener("loadeddata", () => setLoading(false));
 
         const webcamClient = new WebcamClient(videoRef.current.id);
         const webEyeTrackProxy = new WebEyeTrackProxy(webcamClient);
@@ -158,6 +165,16 @@ export default function DemoApp({ onBack }: DemoAppProps) {
       <div className="absolute left-0 right-0 w-full h-full z-100 pointer-events-none">
         <GazeDot x={gaze.x} y={gaze.y} gazeState={gaze.gazeState} />
       </div>
+
+      {/* Loading overlay while models download and the camera spins up */}
+      {loading && (
+        <div className="fixed inset-0 z-90 flex flex-col items-center justify-center gap-3 bg-black text-white">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+          <p className="text-sm text-white/70">
+            Loading WebEyeTrack models… this can take a few seconds on first visit.
+          </p>
+        </div>
+      )}
 
       {/* Main layout */}
       <div className="flex flex-col min-h-screen justify-between w-full bg-black">
