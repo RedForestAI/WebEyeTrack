@@ -1,7 +1,7 @@
 import time
 import pathlib
 from typing import Union, Any, Tuple, Optional, List, Literal
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import random
 
 import tensorflow as tf
@@ -171,8 +171,8 @@ class WebEyeTrackConfig():
     screen_cm_dimensions: Tuple[float, float] = (53.1, 29.8)
     verbose: bool = False
     affine_matrix: Optional[np.ndarray] = None
-    kalman_config: KalmanFilterConfig = KalmanFilterConfig()
-    calib_config: CalibConfig = CalibConfig()
+    kalman_config: KalmanFilterConfig = field(default_factory=lambda: KalmanFilterConfig())
+    calib_config: CalibConfig = field(default_factory=lambda: CalibConfig())
 
 class WebEyeTrack():
 

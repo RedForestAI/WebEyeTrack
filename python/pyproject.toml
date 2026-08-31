@@ -7,7 +7,7 @@ authors = [
 ]
 license = 'MIT'
 readme = "README.md"
-requires-python = ">3.6"
+requires-python = ">=3.9, <3.13" # mediapipe requires 3.9-3.12
 
 keywords = ["eye-tracking", "scalable", "rgb", "gaze"]
 
@@ -19,7 +19,8 @@ dependencies = [
     'mediapipe',
     'numpy',
     "opencv-python",
-    "scipy"
+    "scipy",
+    "tensorflow",
 ]
 
 [project.optional-dependencies]
@@ -42,6 +43,11 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[tool.setuptools.package-data]
+webeyetrack = [
+    "model_weights/*",
+]
 
 [tool.ruff]
 ignore = ["E501"]

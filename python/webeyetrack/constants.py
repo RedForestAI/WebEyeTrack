@@ -1,8 +1,8 @@
 import pathlib
 import numpy as np
 
-GIT_ROOT = pathlib.Path(__file__).parent.parent.parent
-PACKAGE_DIR = GIT_ROOT / 'python' / 'webeyetrack'
+# Resolve paths relative to the installed package directory (not GIT_ROOT) so it works in wheels. importlib.resources might be a better option.
+PACKAGE_DIR = pathlib.Path(__file__).parent
 DEFAULT_CONFIG = PACKAGE_DIR / 'default_config.yaml'
 MODEL_WEIGHTS = PACKAGE_DIR / 'model_weights'
 FACE_LANDMARKER_PATH = MODEL_WEIGHTS / 'face_landmarker_v2_with_blendshapes.task'
