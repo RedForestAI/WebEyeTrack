@@ -130,7 +130,7 @@ export default class WebEyeTrack {
     })
   }
 
-  handleClick(x: number, y: number) {
+  async handleClick(x: number, y: number): Promise<void> {
     console.log(`🖱️ Global click at: (${x}, ${y}), ${this.loaded}`);
 
     // Debounce clicks based on the latest click timestamp
@@ -141,8 +141,8 @@ export default class WebEyeTrack {
     }
 
     // Avoid pts that are too close to the last click
-    if (this.latestMouseClick && 
-        Math.abs(x - this.latestMouseClick.x) < 0.05 && 
+    if (this.latestMouseClick &&
+        Math.abs(x - this.latestMouseClick.x) < 0.05 &&
         Math.abs(y - this.latestMouseClick.y) < 0.05) {
       console.log("🖱️ Click ignored due to proximity to last click");
       this.latestMouseClick = { x, y, timestamp: Date.now() };
@@ -153,7 +153,7 @@ export default class WebEyeTrack {
 
     if (this.loaded && this.latestGazeResult) {
       // Adapt the model based on the click position
-      this.adapt(
+      await this.adapt(
         [this.latestGazeResult?.eyePatch as ImageData],
         [this.latestGazeResult?.headVector as number[]],
         [this.latestGazeResult?.faceOrigin3D as number[]],
@@ -247,7 +247,7 @@ export default class WebEyeTrack {
     ];
   }
 
-  adapt(
+  async adapt(
     eyePatches: ImageData[],
     headVectors: number[][],
     faceOrigins3D: number[][],
@@ -255,7 +255,7 @@ export default class WebEyeTrack {
     stepsInner: number = 1,
     innerLR: number = 1e-5,
     ptType: 'calib' | 'click' = 'calib'
-  ) {
+  ): Promise<void> {
 
     // Prune old calibration data
     this.pruneCalibData();
@@ -293,7 +293,11 @@ export default class WebEyeTrack {
       tfSupportY = supportY;
     }
 
-    // Perform a single forward pass to compute an affine transformation
+    // Perform a single forward pass to compute an affine transformation.
+    // Uses the async .array() (not .arraySync()) so reading the tensors back
+    // from the GPU doesn't force a synchronous stall — .arraySync() blocks
+    // until the GPU finishes and flushes its command queue, which can jank
+    // rendering elsewhere on the page even though this runs in a worker.
     if (tfEyePatches.shape[0] > 3) {
       const supportPreds = tf.tidy(() => {
         return this.blazeGaze.predict(
@@ -302,12 +306,18 @@ export default class WebEyeTrack {
           tfFaceOrigins3D
         );
       })
-      const supportPredsNumber = supportPreds.arraySync() as number[][];
-      const supportYNumber = tfSupportY.arraySync() as number[][];
+      const [supportPredsNumber, supportYNumber] = await Promise.all([
+        supportPreds.array() as Promise<number[][]>,
+        tfSupportY.array() as Promise<number[][]>
+      ]);
+      tf.dispose(supportPreds);
       const affineMatrixML = computeAffineMatrixML(
         supportPredsNumber,
         supportYNumber
       )
+      if (this.affineMatrix) {
+        tf.dispose(this.affineMatrix);
+      }
       this.affineMatrix = tf.tensor2d(affineMatrixML, [2, 3], 'float32');
     }
 

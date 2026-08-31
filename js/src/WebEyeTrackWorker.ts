@@ -37,8 +37,8 @@ self.onmessage = async (e) => {
       status = 'calib';
       self.postMessage({ type: 'statusUpdate', status: status});
 
-      tracker.handleClick(payload.x, payload.y);
-      
+      await tracker.handleClick(payload.x, payload.y);
+
       status = 'idle';
       self.postMessage({ type: 'statusUpdate', status: status});
       break;
