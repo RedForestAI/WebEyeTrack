@@ -207,14 +207,14 @@ export default function App() {
             <div className="mb-6">
 
               <YouTubeEmbed
-                src="https://www.youtube.com/watch?v=EhFJplhuQGY" // or just "YOUR_VIDEO_ID"
+                src="https://www.youtube.com/watch?v=_Gqu476k6n0" // or just "YOUR_VIDEO_ID"
                 title="WebEyeTrack demo"
                 aspect="16/9"      // or "4/3" | "1/1" | "56.25%" custom
                 lite               // renders a thumbnail until clicked (performance)
                 autoplay           // start playback after click
               />
 
-              {/* https://youtu.be/EhFJplhuQGY */}
+              {/* https://youtu.be/_Gqu476k6n0 */}
               {/* <img src={`${import.meta.env.BASE_URL}/demo.gif`} alt="WebEyeTrack demo screenshot" className="rounded-lg border w-full" /> */}
               <Button className="w-full mt-4" variant="outline" size="lg" onClick={openDemo}>
                 Click to use live demo
